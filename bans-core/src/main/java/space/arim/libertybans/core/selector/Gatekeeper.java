@@ -134,6 +134,11 @@ public final class Gatekeeper {
 		if (!configs.getMainConfig().platforms().proxies().enforceServerSwitch()) {
 			return futuresFactory.completedFuture(null);
 		}
+		for (String exemptServer : configs.getMainConfig().platforms().proxies().exemptServers()) {
+			if (exemptServer.equalsIgnoreCase(destinationServer)) {
+				return futuresFactory.completedFuture(null);
+			}
+		}
 		return queryExecutor.get().queryWithRetry((context, transaction) -> {
 			Instant currentTime = time.currentTimestamp();
 			var altsRegistry = configs.getMainConfig().enforcement().altsRegistry();
