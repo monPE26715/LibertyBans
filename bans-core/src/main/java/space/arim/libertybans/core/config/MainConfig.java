@@ -242,6 +242,19 @@ public interface MainConfig {
 			@DefaultBoolean(true)
 			boolean enforceServerSwitch();
 
+			@ConfKey("exempt-servers")
+			@ConfComments({
+					"A list of servers which are exempt from punishment checks during server switches.",
+					"Players will be allowed to connect to these servers even if they are banned.",
+					"",
+					"Server names are case-insensitive and should match the names configured in the proxy.",
+					"For example, if you have a 'hub' server that should always be accessible:",
+					"exempt-servers:",
+					"  - 'hub'"
+			})
+			@DefaultStrings({})
+			List<String> exemptServers();
+
 		}
 	}
 
