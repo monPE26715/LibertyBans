@@ -32,15 +32,19 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import space.arim.libertybans.core.config.Configs;
 import space.arim.libertybans.core.env.PlatformListener;
 import space.arim.libertybans.core.selector.Guardian;
 import space.arim.omnibus.util.ThisClass;
+
+import java.util.List;
 
 public final class ConnectionListener implements PlatformListener {
 
 	private final PluginContainer plugin;
 	private final ProxyServer server;
 	private final Guardian guardian;
+	private final Configs configs;
 
 	private static final Logger logger = LoggerFactory.getLogger(ThisClass.get());
 
@@ -49,6 +53,7 @@ public final class ConnectionListener implements PlatformListener {
 		this.plugin = plugin;
 		this.server = server;
 		this.guardian = guardian;
+		this.configs = configs;
 	}
 
 	@Override
@@ -65,6 +70,11 @@ public final class ConnectionListener implements PlatformListener {
 	public EventTask onConnect(LoginEvent event) {
 		if (!event.getResult().isAllowed()) {
 			logger.trace("Event {} is already blocked", event);
+			return null;
+		}
+		List<String> exemptServers = configs.getMainConfig().platforms().proxies().exemptServers();
+		if (!exemptServers.isEmpty() && configs.getMainConfig().platforms().proxies().enforceServerSwitch()) {
+			logger.trace("Exempt servers configured; deferring ban check to server switch for {}", event);
 			return null;
 		}
 		Player player = event.getPlayer();
